@@ -4,7 +4,7 @@ Package for dbt that allows users to train, audit and use BigQuery ML models. Th
 
 ### Installation
 
-To install the package add the local package path to the `packages.yml` file in your dbt project
+To install the package add the package path to the `packages.yml` file in your dbt project
 
 In order to use the model audit post-hook the following variables have to be set in your `dbt_project.yml` file.
 
