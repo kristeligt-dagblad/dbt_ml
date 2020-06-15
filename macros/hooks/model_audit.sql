@@ -1,13 +1,19 @@
-{% set _audit_table_columns = {
+{% macro _audit_table_columns() %}
+
+{% do return ({
     'model': 'string',
     'schema': 'string',
     'created_at': dbt_utils.type_timestamp(),
     'training_info': 'array<struct<training_run int64, iteration int64, loss float64, eval_loss float64, learning_rate float64, duration_ms int64, cluster_info array<struct<centroid_id int64, cluster_radius float64, cluster_size int64>>>>',
     'feature_info': 'array<struct<input string, min float64, max float64, mean float64, median float64, stddev float64, category_count int64, null_count int64>>',
     'weights': 'array<struct<processed_input string, weight float64, category_weights array<struct<category string, weight float64>>>>',
-} %}
+}) %}
 
-{% set _audit_insert_templates = {
+{% endmacro %}
+
+{% macro _audit_insert_templates() %}
+
+{% do return ({
     'default': {
         'training_info': [
             'training_run',
@@ -33,19 +39,21 @@
         ],
         'feature_info': ['*']
     }
-} %}
+}) %}
+
+{% endmacro %}
 
 {% macro _get_audit_info_cols(model_type, info_type) %}
 
     {% set cols = none %}
-    {% if model_type in _audit_insert_templates.keys() %}
-        {% if info_type in _audit_insert_templates[model_type].keys() %}
-            {% set cols = _audit_insert_templates[model_type][info_type] %}
+    {% if model_type in dbt_ml._audit_insert_templates().keys() %}
+        {% if info_type in dbt_ml._audit_insert_templates()[model_type].keys() %}
+            {% set cols = dbt_ml._audit_insert_templates()[model_type][info_type] %}
         {% endif %}
     {% endif %}
 
     {% if cols is none %}
-        {% set cols = _audit_insert_templates['default'][info_type] %}
+        {% set cols = dbt_ml._audit_insert_templates()['default'][info_type] %}
     {% endif %}
 
     {% do return(cols) %}
@@ -55,7 +63,7 @@
 {% macro model_audit() %}
 
     {% set model_type = config.get('ml_config')['model_type'] %}
-    {% set model_type_repr = _audit_insert_templates.get(model_type, 'default') %}
+    {% set model_type_repr = dbt_ml._audit_insert_templates().get(model_type, 'default') %}
 
     {% set info_types = ['training_info', 'feature_info', 'weights'] %}
 
@@ -68,8 +76,8 @@
         current_timestamp as created_at,
 
         {% for info_type in info_types %}
-            {% if info_type not in _audit_insert_templates[model_type_repr] %}
-                cast(null as {{ _audit_table_columns[info_type] }}) as {{ info_type }}
+            {% if info_type not in dbt_ml._audit_insert_templates()[model_type_repr] %}
+                cast(null as {{ dbt_ml._audit_table_columns()[info_type] }}) as {{ info_type }}
             {% else %}
                 array(
                     select as struct {{ dbt_ml._get_audit_info_cols(model_type, info_type) | join(', ') }}
@@ -95,7 +103,7 @@
     {% if not audit_table_exists -%}
         create table if not exists {{ audit_table }}
         (
-        {% for column, type in _audit_table_columns.items() %}
+        {% for column, type in dbt_ml._audit_table_columns().items() %}
             {{ column }} {{ type }}{% if not loop.last %},{% endif %}
         {% endfor %}
         )
