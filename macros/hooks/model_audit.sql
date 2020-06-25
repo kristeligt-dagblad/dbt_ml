@@ -13,33 +13,54 @@
 
 {% macro _audit_insert_templates() %}
 
-{% do return ({
-    'default': {
-        'training_info': [
-            'training_run',
-            'iteration',
-            'loss',
-            'eval_loss',
-            'learning_rate',
-            'duration_ms',
-            'array(select as struct null as centroid_id, cast(null as float64) as cluster_radius, null as cluster_size)'
-        ],
-        'feature_info': ['*'],
-        'weights': ['*']
-    },
-    'kmeans': {
-        'training_info': [
-            'training_run',
-            'iteration',
-            'loss',
-            'cast(null as float64) as eval_loss',
-            'cast(null as float64) as learning_rate',
-            'duration_ms',
-            'cluster_info'
-        ],
-        'feature_info': ['*']
-    }
-}) %}
+{%- set schemas -%}
+
+default: &default
+    training_info: &default_training_info
+        - training_run
+        - iteration
+        - loss
+        - eval_loss
+        - learning_rate
+        - duration_ms
+        - array(select as struct null as centroid_id, cast(null as float64) as cluster_radius, null as cluster_size)
+    feature_info: &default_feature_info ['*']
+automl_classifier:
+    training_info: *default_training_info
+    feature_info: *default_feature_info
+    weights: ['*']
+automl_regressor:
+    training_info: *default_training_info
+    feature_info: *default_feature_info
+    weights: ['*']
+boosted_tree_classifier: *default
+boosted_tree_regressor: *default
+dnn_classifier: *default
+dnn_regressor: *default
+kmeans:
+    training_info:
+        - training_run
+        - iteration
+        - loss
+        - eval_loss
+        - learning_rate
+        - duration_ms
+        - cluster_info
+    feature_info: *default_feature_info
+linear_reg:
+    training_info: *default_training_info
+    feature_info: *default_feature_info
+    weights: ['*']
+logistic_reg:
+    training_info: *default_training_info
+    feature_info: *default_feature_info
+    weights: ['*']
+matrix_factorization: *default
+tensorflow: {}
+
+{%- endset -%}
+
+{% do return(fromyaml(schemas)) %}
 
 {% endmacro %}
 
@@ -63,7 +84,7 @@
 {% macro model_audit() %}
 
     {% set model_type = config.get('ml_config')['model_type'] %}
-    {% set model_type_repr = dbt_ml._audit_insert_templates().get(model_type, 'default') %}
+    {% set model_type_repr = model_type if model_type in dbt_ml._audit_insert_templates().keys() else 'default' %}
 
     {% set info_types = ['training_info', 'feature_info', 'weights'] %}
 
