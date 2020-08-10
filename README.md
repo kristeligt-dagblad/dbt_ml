@@ -15,6 +15,23 @@ In order to use the model audit post-hook the following variables have to be set
 
 You will also need to specify the post-hook in your `dbt_project.yml` file<sup>[1]</sup> as `{{ dbt_ml.model_audit() }}`. Optionally, you can use the `dbt_ml.create_model_audit_table()` macro to create the audit table automatically if it does not exist - for example in an on-run-start hook.
 
+Example config for `dbt_project.yml` below:
+```yaml
+vars:
+  "dbt_ml:audit_schema": "audit"
+  "dbt_ml:audit_table": "ml_models"
+on-run-start:
+  - '{% do adapter.create_schema(api.Relation.create(target.project, "audit")) %}'
+  - "{{ dbt_ml.create_model_audit_table() }}"
+models:
+  <project>:
+    ml:
+      enabled: true
+      schema: ml
+      materialized: model
+      post-hook: "{{ dbt_ml.model_audit() }}"
+```
+
 ### Usage
 
 In order to use the `model` materialization, simply create a `.sql` file with a select statement and set the materialization to `model`. Additionaly, specify any BigQuery ML options in the `ml_config` key of the config dictionary.
@@ -54,7 +71,7 @@ with eval_data as (
     ...
 )
 
-select {{ dbt_ml.predict(ref('model'), 'eval_data') }}
+select * from {{ dbt_ml.predict(ref('model'), 'eval_data') }}
 ```
 
 ### Documentation
