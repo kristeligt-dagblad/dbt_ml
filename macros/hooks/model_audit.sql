@@ -42,7 +42,7 @@ kmeans:
         - training_run
         - iteration
         - loss
-        - eval_loss
+        - cast(null as float64) as eval_loss
         - learning_rate
         - duration_ms
         - cluster_info
