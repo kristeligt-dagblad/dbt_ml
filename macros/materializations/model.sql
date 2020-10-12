@@ -1,5 +1,11 @@
 {% macro drop_model(relation) %}
-    {{ adapter_macro('dbt_ml.drop_model', relation) }}
+    {{
+        adapter.dispatch(
+            macro_name='drop_model',
+            packages=var('dbt_ml_dispatch_list', []) + ['dbt_ml']
+        )
+        (relation)
+    }}
 {% endmacro %}
 
 {% macro default__drop_model(relation) %}
@@ -31,7 +37,13 @@
 {%- endmacro -%}
 
 {% macro create_model_as(relation, sql) -%}
-    {{ adapter_macro('dbt_ml.create_model_as', relation, sql) }}
+    {{
+        adapter.dispatch(
+            macro_name='create_model_as',
+            packages=var('dbt_ml_dispatch_list', []) + ['dbt_ml']
+        )
+        (relation, sql)
+    }}
 {%- endmacro %}
 
 {% macro default__create_model_as(relation, sql) %}
