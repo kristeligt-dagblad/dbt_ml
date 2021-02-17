@@ -47,6 +47,16 @@ kmeans:
         - duration_ms
         - cluster_info
     feature_info: *default_feature_info
+arima:
+    training_info:
+        - training_run
+        - iteration
+        - cast(null as float64) as loss
+        - cast(null as float64) as eval_loss
+        - cast(null as float64) as learning_rate
+        - duration_ms
+        - array(select as struct null as centroid_id, cast(null as float64) as cluster_radius, null as cluster_size)
+    feature_info: *default_feature_info
 linear_reg:
     training_info: *default_training_info
     feature_info: *default_feature_info
@@ -83,7 +93,7 @@ tensorflow: {}
 
 {% macro model_audit() %}
 
-    {% set model_type = config.get('ml_config')['model_type'] %}
+    {% set model_type = config.get('ml_config')['model_type'].lower() %}
     {% set model_type_repr = model_type if model_type in dbt_ml._audit_insert_templates().keys() else 'default' %}
 
     {% set info_types = ['training_info', 'feature_info', 'weights'] %}
