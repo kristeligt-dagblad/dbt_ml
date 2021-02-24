@@ -93,7 +93,7 @@ tensorflow: {}
 
 {% macro model_audit() %}
 
-    {% set model_type = config.get('ml_config')['model_type'].lower() %}
+    {% set model_type = config.get('ml_config')['model_type'].lower() if config.get('ml_config')['model_type'] else None  %}
     {% set model_type_repr = model_type if model_type in dbt_ml._audit_insert_templates().keys() else 'default' %}
 
     {% set info_types = ['training_info', 'feature_info', 'weights'] %}
