@@ -70,7 +70,7 @@
     {{ sql_header if sql_header is not none }}
 
     create or replace model {{ relation }}
-    {{ transform(
+    {{ dbt_ml.transform(
           transform_config=transform_config
       ) }}
     {{ dbt_ml.model_options(
