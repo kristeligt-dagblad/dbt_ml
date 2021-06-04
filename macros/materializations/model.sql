@@ -39,9 +39,15 @@
 {% macro transform(transform_config) %}
 
     {% set transforms -%}
-        TRANSFORM({% for opt_key, opt_val in transform_config.items() %}
-        {{ opt_val }} as {{ opt_key }}{{ ',' if not loop.last }}
-        {% endfor %})
+        TRANSFORM(
+          {% for opt_key, opt_val in transform_config.items() %}
+            {%- if opt_key in ['label', '*'] -%}
+              {{ opt_key }}{{ ',' if not loop.last }}
+            {%- else -%}
+              {{ opt_val }} as {{ opt_key }}{{ ',' if not loop.last }}
+            {%- endif -%}
+          {% endfor %}
+        )
     {%- endset %}
 
     {%- do return(transforms) -%}
