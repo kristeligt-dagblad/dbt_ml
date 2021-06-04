@@ -36,6 +36,17 @@
     {%- do return(options) -%}
 {%- endmacro -%}
 
+{% macro transform(transform_config) %}
+
+    {% set transforms -%}
+        TRANSFORM({% for opt_key, opt_val in transform_config.items() %}
+        {{ opt_val }} as {{ opt_key }}{{ ',' if not loop.last }}
+        {% endfor %})
+    {%- endset %}
+
+    {%- do return(transforms) -%}
+{%- endmacro -%}
+
 {% macro create_model_as(relation, sql) -%}
     {{
         adapter.dispatch(
@@ -52,12 +63,16 @@
 
 {% macro bigquery__create_model_as(relation, sql) %}
     {%- set ml_config = config.get('ml_config', {}) -%}
+    {%- set transform_config = config.get('transform_config', {}) -%}
     {%- set raw_labels = config.get('labels', {}) -%}
     {%- set sql_header = config.get('sql_header', none) -%}
 
     {{ sql_header if sql_header is not none }}
 
     create or replace model {{ relation }}
+    {{ transform(
+          transform_config=transform_config
+      ) }}
     {{ dbt_ml.model_options(
         ml_config=ml_config,
         labels=raw_labels
@@ -69,7 +84,7 @@
 
 {% materialization model, adapter='bigquery' -%}
     {%- set identifier = model['alias'] -%}
-    {%- set old_relation = adapter.get_relation(database=database, schema=schema, identifier=identifier) -%}    
+    {%- set old_relation = adapter.get_relation(database=database, schema=schema, identifier=identifier) -%}
     {%- set target_relation = api.Relation.create(database=database, schema=schema, identifier=identifier) -%}
 
     {{ run_hooks(pre_hooks) }}
