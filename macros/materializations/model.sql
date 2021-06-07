@@ -76,11 +76,11 @@
     {{ sql_header if sql_header is not none }}
 
     create or replace model {{ relation }}
-    {%- if len(transform_config) > 0 -%}
+    {% if len(transform_config) > 0 %}
       {{ dbt_ml.transform(
             transform_config=transform_config
         ) }}
-    {%- endif -%}
+    {% endif %}
     {{ dbt_ml.model_options(
         ml_config=ml_config,
         labels=raw_labels
