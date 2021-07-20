@@ -2,7 +2,7 @@
     {{
         adapter.dispatch(
             macro_name='drop_model',
-            packages=var('dbt_ml_dispatch_list', []) + ['dbt_ml']
+            macro_namespace='dbt_ml'
         )
         (relation)
     }}
@@ -40,7 +40,7 @@
     {{
         adapter.dispatch(
             macro_name='create_model_as',
-            packages=var('dbt_ml_dispatch_list', []) + ['dbt_ml']
+            macro_namespace='dbt_ml'
         )
         (relation, sql)
     }}
