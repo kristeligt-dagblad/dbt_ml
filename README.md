@@ -74,6 +74,15 @@ with eval_data as (
 select * from {{ dbt_ml.predict(ref('model'), 'eval_data') }}
 ```
 
+### Overriding the package
+If a user wishes to override/shim this package, instead of defining a var named `dbt_ml_dispatch_list`, they should now define [a config](https://next.docs.getdbt.com/reference/project-configs/dispatch-config) in `dbt_project.yml`, for instance:
+
+```yaml
+dispatch:
+  - macro_namespace: dbt_ml
+    search_order: ['my_project', 'dbt_ml']  # enable override
+```
+
 ### Documentation
 
 #### `model` _materialization_ ([source](macros/materializations/model.sql))
