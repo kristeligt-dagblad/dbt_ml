@@ -97,9 +97,14 @@ To keep track of a model over time the package implements a post-hook that runs 
 
 The package implements the `predict` macro that allow users to reference a `model` in ordinary dbt models downstream. The macro makes sure that the model is part of the lineage graph, and handles the boilerplate required when calling the `ml.predict()` function natively in BigQuery.
 
+### Reservations
+Some BigQuery ML models, e.g. Matrix Factorization, cannot be run using the on-demand pricing model. In order to train such models, please set up a flex or regular reservation<sup>[2]</sup>  prior to running the model.
+
 ### Footnotes
 
 [1] The post-hook has to be specified in the `dbt_project.yml` instead of the actual model file because the relation is not available during parsing hence variables like `{{ this }}` are not properly templated.
+
+[2] https://cloud.google.com/bigquery/docs/reservations-tasks
 
 ### References
 
