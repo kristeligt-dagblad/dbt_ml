@@ -74,6 +74,28 @@ with eval_data as (
 select * from {{ dbt_ml.predict(ref('model'), 'eval_data') }}
 ```
 
+### Tuning hyperparameters
+BigQuery ML supports tuning model hyperparameters<sup>[2]</sup>, as does `dbt_ml`. In order to specify which hyperparameters to tune, and which parameterspace to use, one can use the `dbt_ml.hparam_candidates` and `dbt_ml.hparam_range` macros that map to the corresponding BigQuery ML methods.
+
+The following example takes advantage of hyperparameter tuning:
+```sql
+{{
+    config(
+        materialized='model',
+        ml_config={
+            'model_type': 'dnn_classifier',
+            'auto_class_weights': true,
+            'learn_rate': dbt_ml.hparam_range(0.01, 0.1),
+            'early_stop': false,
+            'max_iterations': 50,
+            'num_trials': 4,
+            'optimizer': dbt_ml.hparam_candidates(['adam', 'sgd'])
+        }
+    )
+}}
+```
+It is worth noting that one must set the `num_trials` parameter to a positive integer, otherwise BigQuery will return an error.
+
 ### Overriding the package
 If a user wishes to override/shim this package, instead of defining a var named `dbt_ml_dispatch_list`, they should now define [a config](https://next.docs.getdbt.com/reference/project-configs/dispatch-config) in `dbt_project.yml`, for instance:
 
@@ -83,28 +105,16 @@ dispatch:
     search_order: ['my_project', 'dbt_ml']  # enable override
 ```
 
-### Documentation
-
-#### `model` _materialization_ ([source](macros/materializations/model.sql))
-
-In order to build (= train) machine learning models in dbt we need to step outside the table and view relations that are shipped with dbt. We create a custom materialization that creates a BigQuery ML model from a select statement and various model selection- and hyperparameters. This brings nearly the full featureset of BigQuery ML models to dbt, and allows us to use the native dbt DAG functionality.
-
-#### `model_audit` _post-hook_ ([source](macros/hooks/model_audit.sql))
-
-To keep track of a model over time the package implements a post-hook that runs after a model is trained. The hook queries model-specific temporary tables in BigQuery for information about the training process and the model itself. The gathered information is logged to an audit table.
-
-#### `predict` _macro_ ([source](macros/predict.sql))
-
-The package implements the `predict` macro that allow users to reference a `model` in ordinary dbt models downstream. The macro makes sure that the model is part of the lineage graph, and handles the boilerplate required when calling the `ml.predict()` function natively in BigQuery.
-
 ### Reservations
-Some BigQuery ML models, e.g. Matrix Factorization, cannot be run using the on-demand pricing model. In order to train such models, please set up a flex or regular reservation<sup>[2]</sup>  prior to running the model.
+Some BigQuery ML models, e.g. Matrix Factorization, cannot be run using the on-demand pricing model. In order to train such models, please set up a flex or regular reservation<sup>[3]</sup>  prior to running the model.
 
 ### Footnotes
 
 [1] The post-hook has to be specified in the `dbt_project.yml` instead of the actual model file because the relation is not available during parsing hence variables like `{{ this }}` are not properly templated.
 
-[2] https://cloud.google.com/bigquery/docs/reservations-tasks
+[2] https://cloud.google.com/bigquery-ml/docs/reference/standard-sql/bigqueryml-hyperparameter-tuning
+
+[3] https://cloud.google.com/bigquery/docs/reservations-tasks
 
 ### References
 
