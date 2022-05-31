@@ -69,7 +69,7 @@
         ml_config=ml_config,
         labels=raw_labels
     ) }}
-    {%- if ml_config['MODEL_TYPE'] != 'TENSORFLOW'-%}
+    {%- if ml_config.get('MODEL_TYPE', ml_config.get('model_type', '')).lower() != 'tensorflow' -%}
     as (
         {{ sql }}
     );
