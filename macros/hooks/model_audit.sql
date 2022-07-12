@@ -5,7 +5,7 @@
     'schema': 'string',
     'created_at': dbt_utils.type_timestamp(),
     'training_info': 'array<struct<training_run int64, iteration int64, loss float64, eval_loss float64, learning_rate float64, duration_ms int64, cluster_info array<struct<centroid_id int64, cluster_radius float64, cluster_size int64>>>>',
-    'feature_info': 'array<struct<input string, min float64, max float64, mean float64, stddev float64, category_count int64, null_count int64>>',
+    'feature_info': 'array<struct<input string, min float64, max float64, mean float64, median float64, stddev float64, category_count int64, null_count int64, dimension int64>>',
     'weights': 'array<struct<processed_input string, weight float64, category_weights array<struct<category string, weight float64>>>>',
     'evaluate': 'array<struct<precision	float64, recall	float64, accuracy float64, f1_score float64, log_loss float64, roc_auc float64>>',
 }) %}
