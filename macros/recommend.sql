@@ -1,4 +1,4 @@
-{% macro ml_recommend(relation, source, threshold = none) %}
+{% macro recommend(relation, source, threshold = none) %}
     ml.recommend(
         model {{ relation }},
         (select * from {{ source }})
