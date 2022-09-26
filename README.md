@@ -74,7 +74,7 @@ with eval_data as (
 select * from {{ dbt_ml.predict(ref('model'), 'eval_data') }}
 ```
 
-If you're using a BQML **matrix_factorization** model, you can use the recommend macros in the same way.
+If you're using a BQML **matrix_factorization** model, you can use the recommend macro in the same way.
 ```sql
 # downstream_model.sql
 
