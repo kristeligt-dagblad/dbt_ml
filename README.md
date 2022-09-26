@@ -74,6 +74,18 @@ with eval_data as (
 select * from {{ dbt_ml.predict(ref('model'), 'eval_data') }}
 ```
 
+If you're using a BQML **matrix_factorization** model, you can use the recommend macros in the same way.
+```sql
+# downstream_model.sql
+
+with predict_features AS (
+    ...
+)
+
+select * from {{ dbt_ml.recommend(ref('model'), 'predict_features') }}
+
+```
+
 ### Tuning hyperparameters
 BigQuery ML supports tuning model hyperparameters<sup>[2]</sup>, as does `dbt_ml`. In order to specify which hyperparameters to tune, and which parameterspace to use, one can use the `dbt_ml.hparam_candidates` and `dbt_ml.hparam_range` macros that map to the corresponding BigQuery ML methods.
 
