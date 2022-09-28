@@ -83,7 +83,24 @@ with predict_features AS (
 )
 
 select * from {{ dbt_ml.recommend(ref('model'), 'predict_features') }}
+```
 
+The ML.DETECT_ANOMALIES function provides anomaly detection for BigQuery ML.
+
+```sql
+# detect_anomalies_model.sql
+
+{{
+    config(
+        materialized='table'
+    )
+}}
+
+with eval_data as (
+    ...
+)
+
+select * from {{ dbt_ml.detect_anomalies(ref('model'), 'eval_data', threshold) }}
 ```
 
 ### Tuning hyperparameters
