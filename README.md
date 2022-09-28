@@ -74,6 +74,24 @@ with eval_data as (
 select * from {{ dbt_ml.predict(ref('model'), 'eval_data') }}
 ```
 
+The ML.DETECT_ANOMALIES function provides anomaly detection for BigQuery ML.
+
+```sql
+# detect_anomalies_model.sql
+
+{{
+    config(
+        materialized='table'
+    )
+}}
+
+with eval_data as (
+    ...
+)
+
+select * from {{ dbt_ml.detect_anomalies(ref('model'), 'eval_data', threshold) }}
+```
+
 ### Tuning hyperparameters
 BigQuery ML supports tuning model hyperparameters<sup>[2]</sup>, as does `dbt_ml`. In order to specify which hyperparameters to tune, and which parameterspace to use, one can use the `dbt_ml.hparam_candidates` and `dbt_ml.hparam_range` macros that map to the corresponding BigQuery ML methods.
 
