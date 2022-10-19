@@ -30,7 +30,7 @@
     {% set options -%}
         options(
             {%- for opt_key, opt_val in ml_config.items() -%}
-                {%- if opt_val is sequence and not (opt_val | first) is number and (opt_val | first).startswith('hparam_') -%}
+                {%- if opt_val is sequence and not (opt_val | first) is number and (opt_val | first)[0].startswith('hparam_') -%}
                     {{ opt_key }}={{ opt_val[0] }}({{ opt_val[1:] | join(', ') }})
                 {%- else -%}
                     {{ opt_key }}={{ (opt_val | tojson) if opt_val is string else opt_val }}
