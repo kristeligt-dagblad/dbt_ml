@@ -8,10 +8,11 @@ To install the package add the package path to the `packages.yml` file in your d
 
 In order to use the model audit post-hook the following variables have to be set in your `dbt_project.yml` file.
 
-| Variable              | Description                |
-| --------------------- | -------------------------- |
-| `dbt_ml:audit_schema` | Schema of the audit table. |
-| `dbt_ml:audit_table`  | Name of the audit table.   |
+| Variable              | Description                       |
+| --------------------- | --------------------------------- |
+| `dbt_ml:database`     | Name of the GCP Project to use.   |
+| `dbt_ml:audit_schema` | Schema of the audit table.        |
+| `dbt_ml:audit_table`  | Name of the audit table.          |
 
 You will also need to specify the post-hook in your `dbt_project.yml` file<sup>[1]</sup> as `{{ dbt_ml.model_audit() }}`. Optionally, you can use the `dbt_ml.create_model_audit_table()` macro to create the audit table automatically if it does not exist - for example in an on-run-start hook.
 
