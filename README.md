@@ -20,6 +20,7 @@ Example config for `dbt_project.yml` below:
 vars:
   "dbt_ml:audit_schema": "audit"
   "dbt_ml:audit_table": "ml_models"
+  "dbt_ml:audit_database": "database"
 on-run-start:
   - '{% do adapter.create_schema(api.Relation.create(target.project, "audit")) %}'
   - "{{ dbt_ml.create_model_audit_table() }}"
