@@ -12,8 +12,6 @@
 
 {% endmacro %}
 
-{% endmacro %}
-
 {% macro _audit_insert_templates() %}
 
 {%- set schemas -%}
