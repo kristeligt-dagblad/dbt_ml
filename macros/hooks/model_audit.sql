@@ -37,8 +37,12 @@ automl_regressor:
     weights: ['*']
 boosted_tree_classifier: *default
 boosted_tree_regressor: *default
+random_forest_classifier: *default
+random_forest_regressor: *default
 dnn_classifier: *default
 dnn_regressor: *default
+dnn_linear_combined_classifier: *default
+dnn_linear_combined_regressor: *default
 kmeans:
     training_info:
         - training_run
@@ -69,6 +73,16 @@ arima_plus:
         - duration_ms
         - array(select as struct null as centroid_id, cast(null as float64) as cluster_radius, null as cluster_size)
     feature_info: *default_feature_info
+arima_plus_xreg:
+    training_info:
+        - training_run
+        - iteration
+        - cast(null as float64) as loss
+        - cast(null as float64) as eval_loss
+        - cast(null as float64) as learning_rate
+        - duration_ms
+        - array(select as struct null as centroid_id, cast(null as float64) as cluster_radius, null as cluster_size)
+    feature_info: *default_feature_info
 linear_reg:
     training_info: *default_training_info
     feature_info: *default_feature_info
@@ -78,7 +92,12 @@ logistic_reg:
     feature_info: *default_feature_info
     weights: ['*']
 matrix_factorization: *default
+pca: *default
+autoencoder: *default
 tensorflow: {}
+tensorflow_lite: {}
+xgboost: {}
+onnx: {}
 
 {%- endset -%}
 
