@@ -103,6 +103,13 @@ with eval_data as (
 select * from {{ dbt_ml.detect_anomalies(ref('model'), 'eval_data', threshold) }}
 ```
 
+If using a forecasting model, you can use the forecast macro in the same way. Here we are forecasting 30 units ahead with 80% confidence.
+```sql
+# forecast_model.sql
+
+select * from {{ dbt_ml.forecast(ref('model'), 30, 0.8) }}
+```
+
 ### Tuning hyperparameters
 BigQuery ML supports tuning model hyperparameters<sup>[2]</sup>, as does `dbt_ml`. In order to specify which hyperparameters to tune, and which parameterspace to use, one can use the `dbt_ml.hparam_candidates` and `dbt_ml.hparam_range` macros that map to the corresponding BigQuery ML methods.
 
