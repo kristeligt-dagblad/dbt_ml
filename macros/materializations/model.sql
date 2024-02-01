@@ -25,6 +25,8 @@
             {%- for opt_key, opt_val in ml_config.items() -%}
                 {%- if opt_val is sequence and (opt_val | first) is string and (opt_val | first).startswith('hparam_') -%}
                     {{ opt_key }}={{ opt_val[0] }}({{ opt_val[1:] | join(', ') }})
+                {%- elif opt_key == 'class_weights' -%}
+                    {{ opt_key }}={{ opt_val }}
                 {%- else -%}
                     {{ opt_key }}={{ (opt_val | tojson) if opt_val is string else opt_val }}
                 {%- endif -%}
