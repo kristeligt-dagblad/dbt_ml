@@ -92,7 +92,16 @@ logistic_reg:
     feature_info: *default_feature_info
     weights: ['*']
 matrix_factorization: *default
-pca: *default
+pca:
+    training_info:
+        - training_run
+        - iteration
+        - cast(null as float64) as loss
+        - cast(null as float64) as eval_loss
+        - cast(null as float64) as learning_rate
+        - duration_ms
+        - array(select as struct null as centroid_id, cast(null as float64) as cluster_radius, null as cluster_size)
+    feature_info: *default_feature_info
 autoencoder: *default
 tensorflow: {}
 tensorflow_lite: {}
