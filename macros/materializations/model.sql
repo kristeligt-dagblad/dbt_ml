@@ -54,18 +54,30 @@
     {%- set ml_config = config.get('ml_config', {}) -%}
     {%- set raw_labels = config.get('labels', {}) -%}
     {%- set sql_header = config.get('sql_header', none) -%}
+    {%- set has_sql = true -%}
+
+    {%- if ml_config.get('MODEL_TYPE', ml_config.get('model_type', '')).lower() == 'tensorflow' -%}
+        {%- set has_sql = false -%}
+    {%- endif -%}
 
     {{ sql_header if sql_header is not none }}
 
     create or replace model {{ relation }}
+
+    {% if ml_config.get("connection_name") %}
+        remote with connection `{{ ml_config.pop("connection_name") }}`
+        {% set has_sql = false %}
+    {% endif %}
+
     {{ dbt_ml.model_options(
         ml_config=ml_config,
         labels=raw_labels
     ) }}
-    {%- if ml_config.get('MODEL_TYPE', ml_config.get('model_type', '')).lower() != 'tensorflow' -%}
-    as (
-        {{ sql }}
-    );
+
+    {%- if has_sql -%}
+        as (
+            {{ sql }}
+        );
     {%- endif -%}
 {% endmacro %}
 
