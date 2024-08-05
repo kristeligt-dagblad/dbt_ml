@@ -54,13 +54,13 @@
     {%- set ml_config = config.get('ml_config', {}) -%}
     {%- set raw_labels = config.get('labels', {}) -%}
     {%- set sql_header = config.get('sql_header', none) -%}
-    
+
     {{ sql_header if sql_header is not none }}
 
     create or replace model {{ relation }}
 
-    {% if ml_config.get("connection_name") %}
-        remote with connection `{{ ml_config.pop("connection_name") }}`
+    {% if ml_config.get('connection_name') %}
+        remote with connection `{{ ml_config.pop('connection_name') }}`
     {% endif %}
 
     {{ dbt_ml.model_options(
