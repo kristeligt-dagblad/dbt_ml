@@ -58,14 +58,20 @@
     {{ sql_header if sql_header is not none }}
 
     create or replace model {{ relation }}
+
+    {% if ml_config.get('connection_name') %}
+        remote with connection `{{ ml_config.pop('connection_name') }}`
+    {% endif %}
+
     {{ dbt_ml.model_options(
         ml_config=ml_config,
         labels=raw_labels
     ) }}
-    {%- if ml_config.get('MODEL_TYPE', ml_config.get('model_type', '')).lower() != 'tensorflow' -%}
-    as (
-        {{ sql }}
-    );
+
+    {%- if sql -%}
+        as (
+            {{ sql }}
+        );
     {%- endif -%}
 {% endmacro %}
 
