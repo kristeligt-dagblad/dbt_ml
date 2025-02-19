@@ -138,7 +138,7 @@ onnx: {}
 
     {% set info_types = ['training_info', 'feature_info', 'weights', 'evaluate'] %}
 
-    insert `{{ target.database }}.{{ var('dbt_ml:audit_schema') }}.{{ var('dbt_ml:audit_table') }}`
+    insert `{{ var('dbt_ml:audit_database') }}.{{ var('dbt_ml:audit_schema') }}.{{ var('dbt_ml:audit_table') }}`
     (model, schema, created_at, {{ info_types | join(', ') }})
 
     select
@@ -163,7 +163,7 @@ onnx: {}
 {% macro create_model_audit_table() %}
     {%- set audit_table =
         api.Relation.create(
-            database=target.database,
+            database=var('dbt_ml:audit_database'),
             schema=var('dbt_ml:audit_schema'),
             identifier=var('dbt_ml:audit_table'),
             type='table'
