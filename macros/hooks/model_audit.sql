@@ -186,8 +186,8 @@ onnx: {}
         ) as model_options,
 
         {% for info_type in info_types %}
-            {% if info_type not in dbt_ml._audit_insert_templates()[model_type_repr] %}
-                cast(null as {{ dbt_ml._audit_table_columns()[info_type] }}) as {{ info_type }}
+            {% if info_type not in dbt_ml._audit_insert_templates()[model_type_repr] %}
+                cast(null as {{ dbt_ml._audit_table_columns()[info_type] }}) as {{ info_type }}
             {% else %}
                 array(
                     select as struct {{ dbt_ml._get_audit_info_cols(model_type, info_type) | join(', ') }}
