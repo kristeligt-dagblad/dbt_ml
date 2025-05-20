@@ -1,6 +1,6 @@
 {% macro predict(relation, source, threshold = none) %}
     ml.predict(
-        model {{ relation }},
+        model {{ relation }},
         (select * from {{ source }})
 
         {%- if threshold is not none -%}
