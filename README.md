@@ -28,7 +28,7 @@ models:
       schema: ml
       materialized: model
       post-hook:
-        - '{% do adapter.create_schema(api.Relation.create(target.project, "audit")) %}'
+        - '{% do adapter.create_schema(api.Relation.create(target.project, var("dbt_ml:audit_schema"))) %}'
         - "{{ dbt_ml.create_model_audit_table() }}"
         - "{{ dbt_ml.model_audit() }}"
 ```
