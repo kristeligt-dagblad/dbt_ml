@@ -39,18 +39,22 @@ automl_regressor:
 boosted_tree_classifier:
     training_info: *default_training_info
     feature_info: *default_feature_info
+    evaluate: ['*']
     feature_importance: ['*']
 boosted_tree_regressor:
     training_info: *default_training_info
     feature_info: *default_feature_info
+    evaluate: ['*']
     feature_importance: ['*']
 random_forest_classifier:
     training_info: *default_training_info
     feature_info: *default_feature_info
+    evaluate: ['*']
     feature_importance: ['*']
 random_forest_regressor:
     training_info: *default_training_info
     feature_info: *default_feature_info
+    evaluate: ['*']
     feature_importance: ['*']
 dnn_classifier: *default
 dnn_regressor: *default
