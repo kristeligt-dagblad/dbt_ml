@@ -1,0 +1,5 @@
+integration_tests/profiles.yml
+integration_tests/.user.yml
+integration_tests/logs/*
+integration_tests/dbt_packages/*
+integration_tests/target/*
