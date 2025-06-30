@@ -13,23 +13,24 @@ In order to use the model audit post-hook the following variables have to be set
 | `dbt_ml:audit_schema` | Schema of the audit table. |
 | `dbt_ml:audit_table`  | Name of the audit table.   |
 
-You will also need to specify the post-hook in your `dbt_project.yml` file<sup>[1]</sup> as `{{ dbt_ml.model_audit() }}`. Optionally, you can use the `dbt_ml.create_model_audit_table()` macro to create the audit table automatically if it does not exist - for example in an on-run-start hook.
+You will also need to specify the post-hook in your `dbt_project.yml` file<sup>[1]</sup> as `{{ dbt_ml.model_audit() }}`. Optionally, you can create the audit dataset and use the `dbt_ml.create_model_audit_table()` macro to create the audit table automatically if it does not exist.
 
 Example config for `dbt_project.yml` below:
 ```yaml
 vars:
   "dbt_ml:audit_schema": "audit"
   "dbt_ml:audit_table": "ml_models"
-on-run-start:
-  - '{% do adapter.create_schema(api.Relation.create(target.project, "audit")) %}'
-  - "{{ dbt_ml.create_model_audit_table() }}"
+
 models:
   <project>:
     ml:
       enabled: true
       schema: ml
       materialized: model
-      post-hook: "{{ dbt_ml.model_audit() }}"
+      post-hook:
+        - '{% do adapter.create_schema(api.Relation.create(target.project, var("dbt_ml:audit_schema"))) %}'
+        - "{{ dbt_ml.create_model_audit_table() }}"
+        - "{{ dbt_ml.model_audit() }}"
 ```
 
 ### Usage
