@@ -8,8 +8,7 @@ vars:
   "dbt_ml:audit_table": "ml_models"
 
 on-run-start:
-  - '{% do adapter.create_schema(api.Relation.create(target.project, "audit")) %}'
-  - "{{ dbt_ml.create_model_audit_table() }}"
+  
 
 models:
   dbt_ml_integration_tests:
@@ -17,7 +16,10 @@ models:
     schema: ml_tests
     ml:
       materialized: model
-      post-hook: "{{ dbt_ml.model_audit() }}"
+      post-hook: 
+        - "{{ dbt_ml.model_audit() }}"
+        - '{% do adapter.create_schema(api.Relation.create(target.project, "audit")) %}'
+        - "{{ dbt_ml.create_model_audit_table() }}"
 
 seeds:
   dbt_ml_integration_tests:
