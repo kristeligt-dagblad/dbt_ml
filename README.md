@@ -145,6 +145,28 @@ dispatch:
 ### Reservations
 Some BigQuery ML models, e.g. Matrix Factorization, cannot be run using the on-demand pricing model. In order to train such models, please set up a flex or regular reservation<sup>[3]</sup>  prior to running the model.
 
+
+### How to Contribute
+
+We welcome contributions to `dbt_ml`! To ensure a smooth collaboration process, please follow these guidelines:
+
+#### Branch Strategy
+- **Use the `dev` branch** for all contributions and pull requests
+- The `master` branch is reserved for stable releases only
+- Please create feature branches from `dev` and submit PRs back to `dev`
+
+#### Testing
+- If possible, please run the integration tests before submitting your contribution:
+- **Report your test results** in your pull request description, indicating whether the tests passed or if you encountered any issues
+- Note: Integration tests are not set up as pre-commit hooks because they require BigQuery access and may not be possible for all contributors to run locally
+
+#### Pull Request Process
+1. Fork the repository and create your feature branch from `dev`
+2. Make your changes and test them locally if possible
+3. Update documentation if your changes affect usage
+4. Submit a pull request to the `dev` branch with a clear description of your changes
+5. Include test results in your PR description if you were able to run them
+
 ### Footnotes
 
 [1] The post-hook has to be specified in the `dbt_project.yml` instead of the actual model file because the relation is not available during parsing hence variables like `{{ this }}` are not properly templated.
