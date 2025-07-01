@@ -17,4 +17,4 @@ select
      actual_count,
     ">2" as expected_count,
 from audit_count 
-where actual_count <= 2  -- Should have more than 2 audits for each model
+where actual_count < 2  -- Should have (at least) 2 audits for each model

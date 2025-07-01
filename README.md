@@ -13,23 +13,24 @@ In order to use the model audit post-hook the following variables have to be set
 | `dbt_ml:audit_schema` | Schema of the audit table. |
 | `dbt_ml:audit_table`  | Name of the audit table.   |
 
-You will also need to specify the post-hook in your `dbt_project.yml` file<sup>[1]</sup> as `{{ dbt_ml.model_audit() }}`. Optionally, you can use the `dbt_ml.create_model_audit_table()` macro to create the audit table automatically if it does not exist - for example in an on-run-start hook.
+You will also need to specify the post-hook in your `dbt_project.yml` file<sup>[1]</sup> as `{{ dbt_ml.model_audit() }}`. Optionally, you can create the audit dataset and use the `dbt_ml.create_model_audit_table()` macro to create the audit table automatically if it does not exist.
 
 Example config for `dbt_project.yml` below:
 ```yaml
 vars:
   "dbt_ml:audit_schema": "audit"
   "dbt_ml:audit_table": "ml_models"
-on-run-start:
-  - '{% do adapter.create_schema(api.Relation.create(target.project, "audit")) %}'
-  - "{{ dbt_ml.create_model_audit_table() }}"
+
 models:
   <project>:
     ml:
       enabled: true
       schema: ml
       materialized: model
-      post-hook: "{{ dbt_ml.model_audit() }}"
+      post-hook:
+        - '{% do adapter.create_schema(api.Relation.create(target.project, var("dbt_ml:audit_schema"))) %}'
+        - "{{ dbt_ml.create_model_audit_table() }}"
+        - "{{ dbt_ml.model_audit() }}"
 ```
 
 ### Usage
@@ -143,6 +144,28 @@ dispatch:
 
 ### Reservations
 Some BigQuery ML models, e.g. Matrix Factorization, cannot be run using the on-demand pricing model. In order to train such models, please set up a flex or regular reservation<sup>[3]</sup>  prior to running the model.
+
+
+### How to Contribute
+
+We welcome contributions to `dbt_ml`! To ensure a smooth collaboration process, please follow these guidelines:
+
+#### Branch Strategy
+- **Use the `dev` branch** for all contributions and pull requests
+- The `master` branch is reserved for stable releases only
+- Please create feature branches from `dev` and submit PRs back to `dev`
+
+#### Testing
+- If possible, please run the integration tests before submitting your contribution:
+- **Report your test results** in your pull request description, indicating whether the tests passed or if you encountered any issues
+- Note: Integration tests are not set up as pre-commit hooks because they require BigQuery access and may not be possible for all contributors to run locally
+
+#### Pull Request Process
+1. Fork the repository and create your feature branch from `dev`
+2. Make your changes and test them locally if possible
+3. Update documentation if your changes affect usage
+4. Submit a pull request to the `dev` branch with a clear description of your changes
+5. Include test results in your PR description if you were able to run them
 
 ### Footnotes
 

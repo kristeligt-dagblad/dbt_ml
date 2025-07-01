@@ -4,10 +4,12 @@
     'model': 'string',
     'schema': 'string',
     'created_at': type_timestamp(),
+    'model_options': 'string',
     'training_info': 'array<struct<training_run int64, iteration int64, loss float64, eval_loss float64, learning_rate float64, duration_ms int64, cluster_info array<struct<centroid_id int64, cluster_radius float64, cluster_size int64>>>>',
     'feature_info': 'array<struct<input string, min float64, max float64, mean float64, median float64, stddev float64, category_count int64, null_count int64, dimension int64>>',
     'weights': 'array<struct<processed_input string, weight float64, category_weights array<struct<category string, weight float64>>>>',
     'evaluate': 'array<struct<precision	float64, recall	float64, accuracy float64, f1_score float64, log_loss float64, roc_auc float64>>',
+    'feature_importance': 'array<struct<feature string, importance_weight int64, importance_gain float64, importance_coverage float64>>',
 }) %}
 
 {% endmacro %}
@@ -35,10 +37,26 @@ automl_regressor:
     training_info: *default_training_info
     feature_info: *default_feature_info
     weights: ['*']
-boosted_tree_classifier: *default
-boosted_tree_regressor: *default
-random_forest_classifier: *default
-random_forest_regressor: *default
+boosted_tree_classifier:
+    training_info: *default_training_info
+    feature_info: *default_feature_info
+    evaluate: ['*']
+    feature_importance: ['*']
+boosted_tree_regressor:
+    training_info: *default_training_info
+    feature_info: *default_feature_info
+    evaluate: ['*']
+    feature_importance: ['*']
+random_forest_classifier:
+    training_info: *default_training_info
+    feature_info: *default_feature_info
+    evaluate: ['*']
+    feature_importance: ['*']
+random_forest_regressor:
+    training_info: *default_training_info
+    feature_info: *default_feature_info
+    evaluate: ['*']
+    feature_importance: ['*']
 dnn_classifier: *default
 dnn_regressor: *default
 dnn_linear_combined_classifier: *default
@@ -136,19 +154,40 @@ onnx: {}
     {% set model_type = config.get('ml_config')['model_type'].lower() if config.get('ml_config')['model_type'] else None  %}
     {% set model_type_repr = model_type if model_type in dbt_ml._audit_insert_templates().keys() else 'default' %}
 
-    {% set info_types = ['training_info', 'feature_info', 'weights', 'evaluate'] %}
+    {% set info_types = ['training_info', 'feature_info', 'weights', 'evaluate', 'feature_importance'] %}
 
     insert `{{ target.database }}.{{ var('dbt_ml:audit_schema') }}.{{ var('dbt_ml:audit_table') }}`
-    (model, schema, created_at, {{ info_types | join(', ') }})
+    (model, schema, created_at, model_options, {{ info_types | join(', ') }})
 
     select
         '{{ this.table }}' as model,
         '{{ this.schema }}' as schema,
         current_timestamp as created_at,
 
+        {# Extract and store model options as JSON #}
+        (
+            select to_json_string(
+                {% if model_type is not none %}
+                (select as struct 
+                    {% for key, value in config.get('ml_config').items() %}
+                        {% if value is string %}
+                            '{{ value }}' as {{ key }}{% if not loop.last %},{% endif %}
+                        {% elif value is iterable and value is not mapping %}
+                            [{% for item in value %}'{{ item }}'{% if not loop.last %}, {% endif %}{% endfor %}] as {{ key }}{% if not loop.last %},{% endif %}
+                        {% else %}
+                            {{ value }} as {{ key }}{% if not loop.last %},{% endif %}
+                        {% endif %}
+                    {% endfor %}
+                )
+                {% else %}
+                null
+                {% endif %}
+            )
+        ) as model_options,
+
         {% for info_type in info_types %}
-            {% if info_type not in dbt_ml._audit_insert_templates()[model_type_repr] %}
-                cast(null as {{ dbt_ml._audit_table_columns()[info_type] }}) as {{ info_type }}
+            {% if info_type not in dbt_ml._audit_insert_templates()[model_type_repr] %}
+                cast(null as {{ dbt_ml._audit_table_columns()[info_type] }}) as {{ info_type }}
             {% else %}
                 array(
                     select as struct {{ dbt_ml._get_audit_info_cols(model_type, info_type) | join(', ') }}
