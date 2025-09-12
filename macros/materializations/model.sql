@@ -25,8 +25,11 @@
             {%- for opt_key, opt_val in ml_config.items() -%}
                 {%- if opt_val is sequence and (opt_val | first) is string and (opt_val | first).startswith('hparam_') -%}
                     {{ opt_key }}={{ opt_val[0] }}({{ opt_val[1:] | join(', ') }})
+                {# for lists, in dbt-core a list is rendered as a string as ["a"] but in Fusion as ("a",) #}
+                {%- elif opt_val is sequence and not opt_val is string -%}
+                    {{ opt_key }}={{ tojson(opt_val) }}
                 {%- else -%}
-                    {{ opt_key }}={{ (opt_val | tojson) if opt_val is string else opt_val }}
+                    {{ opt_key }}={{ tojson(opt_val) if opt_val is string else opt_val }}
                 {%- endif -%}
                 {{ ',' if not loop.last }}
             {%- endfor -%}
@@ -51,10 +54,10 @@
 {% endmacro %}
 
 {% macro bigquery__create_model_as(relation, sql) %}
-    {%- set ml_config = config.get('ml_config', {}) -%}
-    {%- set raw_labels = config.get('labels', {}) -%}
+    {%- set ml_config = dbt_ml.config_meta_get('ml_config', {}) -%}
+    {%- set raw_labels = dbt_ml.config_meta_get('labels', {}) -%}
     {%- set sql_header = config.get('sql_header', none) -%}
-    {%- set prevent_overwrite = config.get('prevent_overwrite', False) -%}
+    {%- set prevent_overwrite = dbt_ml.config_meta_get('prevent_overwrite', False) -%}
 
     {{ sql_header if sql_header is not none }}
 
@@ -67,7 +70,7 @@
 
     {{ relation }}
 
-    {% if ml_config.get('connection_name') %}
+    {% if dbt_ml.config_meta_get('connection_name') %}
         remote with connection `{{ ml_config.pop('connection_name') }}`
     {% endif %}
 
