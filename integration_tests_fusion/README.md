@@ -86,6 +86,8 @@ dbtf run --profile integration_tests --select models/ml
 dbtf run --profile integration_tests --exclude models/ml --static-analysis=off
 ```
 
+(Note, when running this with dbt fusion it requires static-analysis to be turned off. See the issue [here](https://github.com/dbt-labs/dbt-fusion/issues/742) tracking it)
+
 6. **Run tests:**
 
 ```bash
