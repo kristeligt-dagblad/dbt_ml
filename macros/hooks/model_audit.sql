@@ -151,7 +151,7 @@ onnx: {}
 
 {% macro model_audit() %}
 
-    {% set model_type = config.get('ml_config')['model_type'].lower() if config.get('ml_config')['model_type'] else None  %}
+    {% set model_type = dbt_ml.config_meta_get('ml_config')['model_type'].lower() if dbt_ml.config_meta_get('ml_config')['model_type'] else None  %}
     {% set model_type_repr = model_type if model_type in dbt_ml._audit_insert_templates().keys() else 'default' %}
 
     {% set info_types = ['training_info', 'feature_info', 'weights', 'evaluate', 'feature_importance'] %}
@@ -169,7 +169,7 @@ onnx: {}
             select to_json_string(
                 {% if model_type is not none %}
                 (select as struct 
-                    {% for key, value in config.get('ml_config').items() %}
+                    {% for key, value in dbt_ml.config_meta_get('ml_config').items() %}
                         {% if value is string %}
                             '{{ value }}' as {{ key }}{% if not loop.last %},{% endif %}
                         {% elif value is iterable and value is not mapping %}

@@ -35,7 +35,11 @@ models:
 
 ### Usage
 
-In order to use the `model` materialization, simply create a `.sql` file with a select statement and set the materialization to `model`. Additionaly, specify any BigQuery ML options in the `ml_config` key of the config dictionary.
+In order to use the `model` materialization, simply create a `.sql` file with a select statement and set the materialization to `model`. Additionaly, specify any BigQuery ML options in the `ml_config` key of under `meta` in the model configuration.
+
+With dbt-core, `ml_config` can be a top level configuration, not nested under `meta`.
+
+Storing `ml_config` under `meta` is the recommended new configuration as it is supported both in dbt-core and Fusion.
 
 ```sql
 # model.sql
@@ -43,11 +47,13 @@ In order to use the `model` materialization, simply create a `.sql` file with a 
 {{
     config(
         materialized='model',
-        ml_config={
-            'model_type': 'logistic_reg',
-            'early_stop': true,
-            'ls_init_learn_rate': 0.1,
-            ...
+        meta = { 
+            'ml_config' : {
+                'model_type': 'logistic_reg',
+                'early_stop': true,
+                'ls_init_learn_rate': 0.1,
+                ...
+            }
         }
     )
 }}
@@ -119,14 +125,16 @@ The following example takes advantage of hyperparameter tuning:
 {{
     config(
         materialized='model',
-        ml_config={
-            'model_type': 'dnn_classifier',
-            'auto_class_weights': true,
-            'learn_rate': dbt_ml.hparam_range(0.01, 0.1),
-            'early_stop': false,
-            'max_iterations': 50,
-            'num_trials': 4,
-            'optimizer': dbt_ml.hparam_candidates(['adam', 'sgd'])
+        meta = {
+            'ml_config' : {
+                'model_type': 'dnn_classifier',
+                'auto_class_weights': true,
+                'learn_rate': dbt_ml.hparam_range(0.01, 0.1),
+                'early_stop': false,
+                'max_iterations': 50,
+                'num_trials': 4,
+                'optimizer': dbt_ml.hparam_candidates(['adam', 'sgd'])
+            }
         }
     )
 }}
