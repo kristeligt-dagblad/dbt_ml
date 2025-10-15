@@ -70,7 +70,7 @@
 
     {{ relation }}
 
-    {% if dbt_ml.config_meta_get('connection_name') %}
+    {% if ml_config.get('connection_name') %}
         remote with connection `{{ ml_config.pop('connection_name') }}`
     {% endif %}
 
