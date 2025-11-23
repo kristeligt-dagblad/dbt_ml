@@ -1,6 +1,6 @@
 # dbt_ml Integration Tests
 
-Integration tests for the dbt_ml package focused on validating BigQuery ML functionality. These tests are parallel to the regular integration tests, specifically for the dbt fusion engine. Though same integration tests here can be run with dbt-core, kept here in parallel while fusion is not in stable release yet.
+Integration tests for the dbt_ml package focused on validating BigQuery ML functionality.
 
 ## What This Tests
 
@@ -8,6 +8,7 @@ Integration tests for the dbt_ml package focused on validating BigQuery ML funct
 
 - **ARIMA_PLUS Model Creation**: Tests time series forecasting model training
 - **Logistic Regression**: Tests classification model training
+- **Connection to Gemini Model**: Tests creating a basic Gemini model over Vertex conection
 - **Model Inference**: Tests `dbt_ml.predict()` and `dbt_ml.forecast()` macros
 - **Audit Schema**: Tests model metadata capture and audit table population
 
@@ -42,7 +43,7 @@ integration_tests/
 
 1. **BigQuery Project**: You need a GCP project with BigQuery ML enabled
 2. **dbt Profile**: Set up a BigQuery profile named `integration_tests`
-3. **Vertex AI Connection**: For remote model tests, create a Vertex AI connection named `vertexai-connection` in the `eu` region with access to Gemini models
+3. **Vertex AI Connection**: For remote model tests, create a Vertex AI connection named `vertexai-connection` in the `eu` region. Make sure to also enable the Vertex AI API. Additionally, grant the Vertex AI user role to your authentication method of choice. See [here](https://docs.cloud.google.com/bigquery/docs/create-cloud-resource-connection) and [here](https://cloud.google.com/bigquery/docs/generate-text-tutorial#grant-permissions) for reference.
 
 Example `profiles.yml`:
 
@@ -61,43 +62,15 @@ integration_tests:
 
 ### Running the Tests
 
-1. **Navigate to integration tests:**
+To run all integration tests with one command, use the Makefile target provided in the project root:
 
 ```bash
-cd integration_tests/
+make integration-test
 ```
 
-2. **Install dependencies:**
+This will install dependencies, seed test data, train ML models, run inference, and execute all tests.
 
-```bash
-dbtf deps
-```
-
-3. **Load test data:**
-
-```bash
-dbtf seed --profile integration_tests
-```
-
-4. **Train ML models:**
-
-```bash
-dbtf run --profile integration_tests --select models/ml
-```
-
-5. **Run inference models:**
-
-```bash
-dbtf run --profile integration_tests --exclude models/ml --static-analysis=off
-```
-
-(Note, when running this with dbt fusion it requires static-analysis to be turned off. See the issue [here](https://github.com/dbt-labs/dbt-fusion/issues/742) tracking it)
-
-6. **Run tests:**
-
-```bash
-dbtf test --profile integration_tests
-```
+_Note: When running with dbt fusion, static-analysis must be turned off due to a known issue; see [here](https://github.com/dbt-labs/dbt-fusion/issues/742) for details._
 
 ## What Gets Tested
 
