@@ -70,12 +70,14 @@
 
     {{ relation }}
 
-    {% if dbt_ml.config_meta_get('connection_name') %}
-        remote with connection `{{ ml_config.pop('connection_name') }}`
+    {% if ml_config.get('connection_name') %}
+        remote with connection `{{ ml_config.get('connection_name') }}`
     {% endif %}
 
+    {%- set ml_options = dict(ml_config|items|rejectattr(0, "eq", "connection_name")) -%}
+
     {{ dbt_ml.model_options(
-        ml_config=ml_config,
+        ml_config=ml_options,
         labels=raw_labels
     ) }}
 
