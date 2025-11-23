@@ -3,3 +3,7 @@ integration_tests/.user.yml
 integration_tests/logs/*
 integration_tests/dbt_packages/*
 integration_tests/target/*
+integration_tests/dbt_internal_packages/*
+dbt_packages/*
+*.log
+logs/*

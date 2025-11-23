@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "dbt-ml-integration-tests"
+version = "0.1.0"
+description = "Integration tests for dbt_ml package"
+authors = ["Oscar Julius Adserballe <oscar.adserballe@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+dbt-core = "~1.8.0"
+dbt-bigquery = "~1.8.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+
+
+

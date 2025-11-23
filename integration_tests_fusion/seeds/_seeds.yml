@@ -1,6 +1,0 @@
-seeds:
-  - name: timeseries_data
-    config:
-      column_types: 
-        date: date
-        sales: integer

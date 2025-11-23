@@ -1,10 +1,12 @@
 {{
     config(
         materialized='model',
-        ml_config={
-            'model_type': 'logistic_reg',
-            'input_label_cols': ['label'],
-            'auto_class_weights': true
+        meta = {
+            'ml_config' : {
+                'model_type': 'logistic_reg',
+                'input_label_cols': ['label'],
+                'auto_class_weights': true
+            }
         }
     )
 }}

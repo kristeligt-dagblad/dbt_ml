@@ -151,6 +151,12 @@ onnx: {}
 
 {% macro model_audit() %}
 
+    {# Skip audit for remote/connection-based models as they don't support metadata queries #}
+    {% set ml_config = dbt_ml.config_meta_get('ml_config', {}) %}
+    {% if 'connection_name' in ml_config %}
+        {% do return('') %}
+    {% endif %}
+
     {% set model_type = dbt_ml.config_meta_get('ml_config')['model_type'].lower() if dbt_ml.config_meta_get('ml_config')['model_type'] else None  %}
     {% set model_type_repr = model_type if model_type in dbt_ml._audit_insert_templates().keys() else 'default' %}
 
