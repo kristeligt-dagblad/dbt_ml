@@ -22,7 +22,7 @@
 
     {% set options -%}
         options(
-            {%- for opt_key, opt_val in ml_config.items() -%}
+            {%- for opt_key, opt_val in ml_config.items() if opt_key != 'connection_name' -%}
                 {%- if opt_val is sequence and (opt_val | first) is string and (opt_val | first).startswith('hparam_') -%}
                     {{ opt_key }}={{ opt_val[0] }}({{ opt_val[1:] | join(', ') }})
                 {# for lists, in dbt-core a list is rendered as a string as ["a"] but in Fusion as ("a",) #}
@@ -74,10 +74,8 @@
         remote with connection `{{ ml_config.get('connection_name') }}`
     {% endif %}
 
-    {%- set ml_options = dict(ml_config|items|rejectattr(0, "eq", "connection_name")) -%}
-
     {{ dbt_ml.model_options(
-        ml_config=ml_options,
+        ml_config=ml_config,
         labels=raw_labels
     ) }}
 
