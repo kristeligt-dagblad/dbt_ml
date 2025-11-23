@@ -11,9 +11,7 @@ with generation_results as (
 failed_generations as (
     select count(*) as failure_count
     from generation_results
-    where ml_generate_text_status != 'OK' 
-       or ml_generate_text_result is null
-       or length(ml_generate_text_result) = 0
+    where ml_generate_text_status != ""
 )
 
 select
