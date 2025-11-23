@@ -62,10 +62,10 @@ integration_tests:
 
 ### Running the Tests
 
-To run all integration tests with one command, use the Makefile target provided in the project root:
+To run all integration tests with one command, use the Makefile target provided in the project root, testing either with `dbt-core` or `dbt-fusion`:
 
 ```bash
-make integration-test
+make test[-fusion]
 ```
 
 This will install dependencies, seed test data, train ML models, run inference, and execute all tests.
